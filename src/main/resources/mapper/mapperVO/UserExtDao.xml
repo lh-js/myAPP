@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.myapp.dao.daoVO.UserExtDAO">
+    <resultMap id="BaseResultMap" type="com.example.myapp.model.User">
+        <id column="open_id" jdbcType="VARCHAR" property="openId" />
+        <result column="username" jdbcType="VARCHAR" property="username" />
+        <result column="avatar" jdbcType="VARCHAR" property="avatar" />
+    </resultMap>
+    <sql id="Base_Column_List">
+        open_id, username, avatar
+    </sql>
+    <select id="selectAll" resultMap="com.example.myapp.dao.daoVO.UserExtDAO.BaseResultMap" parameterType="com.example.myapp.model.User">
+        select
+        <include refid="Base_Column_List"></include>
+        from user
+    </select>
+</mapper>
