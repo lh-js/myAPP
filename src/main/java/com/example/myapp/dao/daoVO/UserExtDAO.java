@@ -10,4 +10,5 @@ import java.util.List;
 public interface UserExtDAO extends UserDAO {
     List<User> selectAll(User user);
 
+    int insertUser(User user);
 }

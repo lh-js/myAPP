@@ -14,4 +14,8 @@
         <include refid="Base_Column_List"></include>
         from user
     </select>
+    <insert id="insertUser" keyColumn="open_id" keyProperty="openId" parameterType="com.example.myapp.model.User" useGeneratedKeys="true">
+        insert into user (username, avatar,open_id)
+        values (#{username,jdbcType=VARCHAR}, #{avatar,jdbcType=VARCHAR},#{openId,jdbcType=VARCHAR})
+    </insert>
 </mapper>

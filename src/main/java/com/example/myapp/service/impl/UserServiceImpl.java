@@ -64,11 +64,10 @@ public class UserServiceImpl implements UserService {
         user.setOpenId(aesUtils.encode(jsonObject.getString("openid")));
         user.setCode(aesUtils.encode(user.getCode()));
 
-//        if(checkIsRegister(jsonObject.getString("openid"))==null){
-//            registerUser(user);
-//        }
+        if(checkIsRegister(aesUtils.encode(jsonObject.getString("openid")))==null){
+            registerUser(user);
+        }
 
-        System.out.println(user);
         return user;
     }
 
@@ -77,7 +76,7 @@ public class UserServiceImpl implements UserService {
     }
 
     int registerUser(User user){
-        return userExtDAO.insert(user);
+        return userExtDAO.insertUser(user);
     }
 
 }
