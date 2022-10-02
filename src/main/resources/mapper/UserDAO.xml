@@ -5,9 +5,10 @@
     <id column="open_id" jdbcType="VARCHAR" property="openId" />
     <result column="username" jdbcType="VARCHAR" property="username" />
     <result column="avatar" jdbcType="VARCHAR" property="avatar" />
+    <result column="expirationtTime" jdbcType="TIMESTAMP" property="expirationttime" />
   </resultMap>
   <sql id="Base_Column_List">
-    open_id, username, avatar
+    open_id, username, avatar, expirationtTime
   </sql>
   <select id="selectByPrimaryKey" parameterType="java.lang.String" resultMap="BaseResultMap">
     select 
@@ -20,8 +21,10 @@
     where open_id = #{openId,jdbcType=VARCHAR}
   </delete>
   <insert id="insert" keyColumn="open_id" keyProperty="openId" parameterType="com.example.myapp.model.User" useGeneratedKeys="true">
-    insert into user (username, avatar)
-    values (#{username,jdbcType=VARCHAR}, #{avatar,jdbcType=VARCHAR})
+    insert into user (username, avatar, expirationtTime
+      )
+    values (#{username,jdbcType=VARCHAR}, #{avatar,jdbcType=VARCHAR}, #{expirationttime,jdbcType=TIMESTAMP}
+      )
   </insert>
   <insert id="insertSelective" keyColumn="open_id" keyProperty="openId" parameterType="com.example.myapp.model.User" useGeneratedKeys="true">
     insert into user
@@ -32,6 +35,9 @@
       <if test="avatar != null">
         avatar,
       </if>
+      <if test="expirationttime != null">
+        expirationtTime,
+      </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides=",">
       <if test="username != null">
@@ -39,6 +45,9 @@
       </if>
       <if test="avatar != null">
         #{avatar,jdbcType=VARCHAR},
+      </if>
+      <if test="expirationttime != null">
+        #{expirationttime,jdbcType=TIMESTAMP},
       </if>
     </trim>
   </insert>
@@ -51,13 +60,17 @@
       <if test="avatar != null">
         avatar = #{avatar,jdbcType=VARCHAR},
       </if>
+      <if test="expirationttime != null">
+        expirationtTime = #{expirationttime,jdbcType=TIMESTAMP},
+      </if>
     </set>
     where open_id = #{openId,jdbcType=VARCHAR}
   </update>
   <update id="updateByPrimaryKey" parameterType="com.example.myapp.model.User">
     update user
     set username = #{username,jdbcType=VARCHAR},
-      avatar = #{avatar,jdbcType=VARCHAR}
+      avatar = #{avatar,jdbcType=VARCHAR},
+      expirationtTime = #{expirationttime,jdbcType=TIMESTAMP}
     where open_id = #{openId,jdbcType=VARCHAR}
   </update>
 </mapper>

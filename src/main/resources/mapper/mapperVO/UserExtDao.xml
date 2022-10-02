@@ -5,9 +5,10 @@
         <id column="open_id" jdbcType="VARCHAR" property="openId" />
         <result column="username" jdbcType="VARCHAR" property="username" />
         <result column="avatar" jdbcType="VARCHAR" property="avatar" />
+        <result column="expirationtTime" jdbcType="TIMESTAMP" property="expirationttime" />
     </resultMap>
     <sql id="Base_Column_List">
-        open_id, username, avatar
+        open_id, username, avatar, expirationtTime
     </sql>
     <select id="selectAll" resultMap="com.example.myapp.dao.daoVO.UserExtDAO.BaseResultMap" parameterType="com.example.myapp.model.User">
         select
@@ -15,7 +16,7 @@
         from user
     </select>
     <insert id="insertUser" keyColumn="open_id" keyProperty="openId" parameterType="com.example.myapp.model.User" useGeneratedKeys="true">
-        insert into user (username, avatar,open_id)
-        values (#{username,jdbcType=VARCHAR}, #{avatar,jdbcType=VARCHAR},#{openId,jdbcType=VARCHAR})
+        insert into user (username, avatar,open_id,expirationtTime)
+        values (#{username,jdbcType=VARCHAR}, #{avatar,jdbcType=VARCHAR},#{openId,jdbcType=VARCHAR},#{expirationttime,jdbcType=TIMESTAMP})
     </insert>
 </mapper>

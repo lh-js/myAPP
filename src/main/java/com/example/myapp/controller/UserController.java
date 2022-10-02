@@ -26,4 +26,5 @@ public class UserController {
     public UserVO login(@RequestBody UserVO user) throws Exception {
         return userServiceImpl.userLogin(user);
     }
+
 }
