@@ -7,8 +7,14 @@ import com.example.myapp.service.impl.UserServiceImpl;
 import com.example.myapp.util.QueryRequest;
 import com.example.myapp.util.QueryResult;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.context.request.RequestAttributes;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
 import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
+import java.util.Enumeration;
+import java.util.Objects;
 
 @RestController
 @RequestMapping("/user")
@@ -25,6 +31,11 @@ public class UserController {
     @PostMapping("/login")
     public UserVO login(@RequestBody UserVO user) throws Exception {
         return userServiceImpl.userLogin(user);
+    }
+
+    @PostMapping("/getUserInfo")
+    public User getUserInfo(){
+        return userServiceImpl.getUserInfo();
     }
 
 }

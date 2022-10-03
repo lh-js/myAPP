@@ -10,6 +10,4 @@ public class UserVO extends User {
 
     private String code;
 
-    private String token;
-
 }

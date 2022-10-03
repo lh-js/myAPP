@@ -15,8 +15,12 @@ import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import org.apache.commons.codec.binary.Base64;
 import org.springframework.stereotype.Service;
+import org.springframework.web.context.request.RequestAttributes;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
 import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -25,8 +29,7 @@ import java.net.MalformedURLException;
 import java.net.ProtocolException;
 import java.net.URL;
 import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.Date;
+import java.util.*;
 
 @Service
 public class UserServiceImpl implements UserService {
@@ -43,6 +46,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserVO userLogin(UserVO user) throws Exception {
+        checkHeaderName();
         String openId= getOpenId(user.getCode());
         if(openId==null){
             throw new NoDataFoundException("openId获取失败");
@@ -65,11 +69,25 @@ public class UserServiceImpl implements UserService {
         user.setToken(token);
         user.setOpenId(openId);
         user.setCode(user.getCode());
-        System.out.println(date);
         user.setExpirationttime(date);
 
         if(checkIsRegister(openId)==null){
             registerUser(user);
+        }else {
+            updateExpirationtTime(user);
+        }
+
+        return user;
+    }
+
+    public User getUserInfo(){
+        String token= checkHeaderName();
+        if(token==null){
+            throw new NoDataFoundException("token获取失败");
+        }
+        User user= checkLogin(token);
+        if(user==null){
+            throw new NoDataFoundException("token过期，请重新登录！");
         }
 
         return user;
@@ -124,12 +142,44 @@ public class UserServiceImpl implements UserService {
         return jsonObject.getString("access_token");
     }
 
+    /**
+     * 获取判断请求头的参数
+     * @return
+     */
+    String checkHeaderName(){
+        RequestAttributes ra = RequestContextHolder.getRequestAttributes();
+        if(Objects.isNull(ra)){
+            System.out.println("服务里RequestAttributes对象为空");
+            return null;
+        }
+        ServletRequestAttributes sra = (ServletRequestAttributes) ra;
+        HttpServletRequest request = sra.getRequest();
+        Enumeration<String> headerNames = request.getHeaderNames();
+        String token = request.getHeader("authorization");
+        System.out.println("accesstoken:"+token);
+        return token;
+    }
+
     User checkIsRegister(String openId){
         return userExtDAO.selectByPrimaryKey((openId));
     }
 
     int registerUser(User user){
         return userExtDAO.insertUser(user);
+    }
+
+    int updateExpirationtTime(User user){
+        return userExtDAO.updateByPrimaryKey(user);
+    }
+
+    User checkLogin(String token){
+        User userInfo= userExtDAO.selectByToken(token);
+        Date now=new Date();
+        if(now.compareTo(userInfo.getExpirationttime())<0){
+            return userInfo;
+        }
+
+        return null;
     }
 
 }

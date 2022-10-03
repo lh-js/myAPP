@@ -6,9 +6,10 @@
     <result column="username" jdbcType="VARCHAR" property="username" />
     <result column="avatar" jdbcType="VARCHAR" property="avatar" />
     <result column="expirationtTime" jdbcType="TIMESTAMP" property="expirationttime" />
+    <result column="token" jdbcType="VARCHAR" property="token" />
   </resultMap>
   <sql id="Base_Column_List">
-    open_id, username, avatar, expirationtTime
+    open_id, username, avatar, expirationtTime, token
   </sql>
   <select id="selectByPrimaryKey" parameterType="java.lang.String" resultMap="BaseResultMap">
     select 
@@ -21,10 +22,10 @@
     where open_id = #{openId,jdbcType=VARCHAR}
   </delete>
   <insert id="insert" keyColumn="open_id" keyProperty="openId" parameterType="com.example.myapp.model.User" useGeneratedKeys="true">
-    insert into user (username, avatar, expirationtTime
-      )
-    values (#{username,jdbcType=VARCHAR}, #{avatar,jdbcType=VARCHAR}, #{expirationttime,jdbcType=TIMESTAMP}
-      )
+    insert into user (username, avatar, expirationtTime, 
+      token)
+    values (#{username,jdbcType=VARCHAR}, #{avatar,jdbcType=VARCHAR}, #{expirationttime,jdbcType=TIMESTAMP}, 
+      #{token,jdbcType=VARCHAR})
   </insert>
   <insert id="insertSelective" keyColumn="open_id" keyProperty="openId" parameterType="com.example.myapp.model.User" useGeneratedKeys="true">
     insert into user
@@ -38,6 +39,9 @@
       <if test="expirationttime != null">
         expirationtTime,
       </if>
+      <if test="token != null">
+        token,
+      </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides=",">
       <if test="username != null">
@@ -48,6 +52,9 @@
       </if>
       <if test="expirationttime != null">
         #{expirationttime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="token != null">
+        #{token,jdbcType=VARCHAR},
       </if>
     </trim>
   </insert>
@@ -63,6 +70,9 @@
       <if test="expirationttime != null">
         expirationtTime = #{expirationttime,jdbcType=TIMESTAMP},
       </if>
+      <if test="token != null">
+        token = #{token,jdbcType=VARCHAR},
+      </if>
     </set>
     where open_id = #{openId,jdbcType=VARCHAR}
   </update>
@@ -70,7 +80,8 @@
     update user
     set username = #{username,jdbcType=VARCHAR},
       avatar = #{avatar,jdbcType=VARCHAR},
-      expirationtTime = #{expirationttime,jdbcType=TIMESTAMP}
+      expirationtTime = #{expirationttime,jdbcType=TIMESTAMP},
+      token = #{token,jdbcType=VARCHAR}
     where open_id = #{openId,jdbcType=VARCHAR}
   </update>
 </mapper>

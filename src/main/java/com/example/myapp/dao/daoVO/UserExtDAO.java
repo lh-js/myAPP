@@ -11,4 +11,6 @@ public interface UserExtDAO extends UserDAO {
     List<User> selectAll(User user);
 
     int insertUser(User user);
+
+    User selectByToken(String token);
 }
