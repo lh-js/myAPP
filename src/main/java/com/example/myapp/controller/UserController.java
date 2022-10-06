@@ -38,4 +38,9 @@ public class UserController {
         return userServiceImpl.getUserInfo();
     }
 
+    @PostMapping("/send")
+    public String send() throws Exception {
+       return userServiceImpl.send();
+    }
+
 }

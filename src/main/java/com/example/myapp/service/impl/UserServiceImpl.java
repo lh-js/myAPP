@@ -2,6 +2,7 @@ package com.example.myapp.service.impl;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson.serializer.SerializerFeature;
 import com.example.myapp.dao.UserDAO;
 import com.example.myapp.dao.daoVO.UserExtDAO;
 import com.example.myapp.exception.NoDataFoundException;
@@ -24,6 +25,7 @@ import javax.servlet.http.HttpServletRequest;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.ProtocolException;
@@ -48,11 +50,11 @@ public class UserServiceImpl implements UserService {
     public UserVO userLogin(UserVO user) throws Exception {
         checkHeaderName();
         String openId= getOpenId(user.getCode());
-        if(openId==null){
+        if(openId==null  || openId==""){
             throw new NoDataFoundException("openId获取失败");
         }
         String token= getAccessToken();
-        if(token==null){
+        if(token==null  || token==""){
             throw new NoDataFoundException("token获取失败");
         }
 
@@ -80,9 +82,10 @@ public class UserServiceImpl implements UserService {
         return user;
     }
 
+    @Override
     public User getUserInfo(){
         String token= checkHeaderName();
-        if(token==null){
+        if(token==null || token==""){
             throw new NoDataFoundException("token获取失败");
         }
         User user= checkLogin(token);
@@ -91,6 +94,73 @@ public class UserServiceImpl implements UserService {
         }
 
         return user;
+    }
+
+    public String send() throws Exception {
+        String token= checkHeaderName();
+        if(token==null || token==""){
+            throw new NoDataFoundException("token获取失败");
+        }
+        User user= checkLogin(token);
+        if(user==null){
+            throw new NoDataFoundException("token过期，请重新登录！");
+        }
+        // 1.请求URL
+        String postUrl = "https://api.weixin.qq.com/cgi-bin/message/subscribe/send?access_token="+token;
+        // 2.请求参数JSON格式
+        JSONObject map = new JSONObject();
+        JSONObject map0 = new JSONObject();
+        JSONObject map1 = new JSONObject();
+        JSONObject map2 = new JSONObject();
+        JSONObject map3 = new JSONObject();
+        JSONObject map4 = new JSONObject();
+        JSONObject map5 = new JSONObject();
+        map1.put("value","1");
+        map2.put("value","2");
+        map3.put("value","3");
+        map4.put("value","2019-12-11 18:36");
+        map5.put("value","2022-12-11 18:36");
+        map0.put("thing3",map1);
+        map0.put("thing4",map2);
+        map0.put("thing9",map3);
+        map0.put("time13",map4);
+        map0.put("time14",map5);
+        map.put("template_id", "N0liGKV50bJRH_sMx4qnNzf-DeZxreWDgcmwry_WeYM");
+        map.put("page", "pages/index/index");
+        map.put("touser", user.getOpenId());
+        map.put("miniprogram_state", "developer");
+        map.put("lang", "zh_CN");
+        JSONObject mapData= JSONObject.parseObject(JSON.toJSONString(map0, SerializerFeature.DisableCircularReferenceDetect));
+        map.put("data", mapData);
+        System.out.println(map);
+        String json = JSON.toJSONString(map);
+        // 3.创建连接与设置连接参数
+        URL urlObj = new URL(postUrl);
+        HttpURLConnection httpConn = (HttpURLConnection) urlObj.openConnection();
+        httpConn.setRequestMethod("POST");
+        httpConn.setRequestProperty("Charset", "UTF-8");
+        // POST请求且JSON数据,必须设置
+        httpConn.setRequestProperty("Content-Type", "application/json");
+        // 打开输出流,默认是false
+        httpConn.setDoOutput(true);
+        // 打开输入流,默认是true,可省略
+        httpConn.setDoInput(true);
+        // 4.从HttpURLConnection获取输出流和写数据
+        OutputStream oStream = httpConn.getOutputStream();
+        oStream.write(json.getBytes());
+        oStream.flush();
+        // 5.发起http调用(getInputStream触发http请求)
+        if (httpConn.getResponseCode() != 200) {
+            throw new Exception("调用服务端异常.");
+        }
+        // 6.从HttpURLConnection获取输入流和读数据
+        BufferedReader br = new BufferedReader(
+                new InputStreamReader(httpConn.getInputStream()));
+        String resultData = br.readLine();
+        System.out.println("从服务端返回结果: " + resultData);
+        // 7.关闭HttpURLConnection连接
+        httpConn.disconnect();
+        return resultData;
     }
 
     String getOpenId(String code) throws Exception {

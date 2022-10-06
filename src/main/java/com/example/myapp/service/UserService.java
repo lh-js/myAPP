@@ -14,4 +14,6 @@ public interface UserService {
     QueryResult<User> selectAllUser(QueryRequest<User> queryRequest);
 
     UserVO userLogin(UserVO user) throws Exception;
+
+    User getUserInfo();
 }
