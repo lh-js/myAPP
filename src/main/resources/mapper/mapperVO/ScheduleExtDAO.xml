@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.myapp.dao.daoVO.ScheduleExtDAO">
+    <resultMap id="BaseResultMap" type="com.example.myapp.model.Schedule">
+        <id column="id" jdbcType="INTEGER" property="id" />
+        <result column="remind_thing" jdbcType="VARCHAR" property="remindThing" />
+        <result column="thing_address" jdbcType="VARCHAR" property="thingAddress" />
+        <result column="start_time" jdbcType="TIMESTAMP" property="startTime" />
+        <result column="end_time" jdbcType="TIMESTAMP" property="endTime" />
+        <result column="remind_time" jdbcType="TIMESTAMP" property="remindTime" />
+        <result column="remark" jdbcType="VARCHAR" property="remark" />
+        <result column="open_id" jdbcType="VARCHAR" property="openId" />
+    </resultMap>
+    <sql id="Base_Column_List">
+        id, remind_thing, thing_address, start_time, end_time, remind_time, remark, open_id
+    </sql>
+    <select id="selectByOpenId" parameterType="java.lang.String" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List" />
+        from schedule
+        where open_id = #{openId,jdbcType=INTEGER}
+    </select>
+</mapper>

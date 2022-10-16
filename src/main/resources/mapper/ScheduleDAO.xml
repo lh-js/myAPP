@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.myapp.dao.ScheduleDAO">
+  <resultMap id="BaseResultMap" type="com.example.myapp.model.Schedule">
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="remind_thing" jdbcType="VARCHAR" property="remindThing" />
+    <result column="thing_address" jdbcType="VARCHAR" property="thingAddress" />
+    <result column="start_time" jdbcType="TIMESTAMP" property="startTime" />
+    <result column="end_time" jdbcType="TIMESTAMP" property="endTime" />
+    <result column="remind_time" jdbcType="TIMESTAMP" property="remindTime" />
+    <result column="remark" jdbcType="VARCHAR" property="remark" />
+    <result column="open_id" jdbcType="VARCHAR" property="openId" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    id, remind_thing, thing_address, start_time, end_time, remind_time, remark, open_id
+  </sql>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from schedule
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+    delete from schedule
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" keyColumn="id" keyProperty="id" parameterType="com.example.myapp.model.Schedule" useGeneratedKeys="true">
+    insert into schedule (remind_thing, thing_address, start_time, 
+      end_time, remind_time, remark, 
+      open_id)
+    values (#{remindThing,jdbcType=VARCHAR}, #{thingAddress,jdbcType=VARCHAR}, #{startTime,jdbcType=TIMESTAMP}, 
+      #{endTime,jdbcType=TIMESTAMP}, #{remindTime,jdbcType=TIMESTAMP}, #{remark,jdbcType=VARCHAR}, 
+      #{openId,jdbcType=VARCHAR})
+  </insert>
+  <insert id="insertSelective" keyColumn="id" keyProperty="id" parameterType="com.example.myapp.model.Schedule" useGeneratedKeys="true">
+    insert into schedule
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="remindThing != null">
+        remind_thing,
+      </if>
+      <if test="thingAddress != null">
+        thing_address,
+      </if>
+      <if test="startTime != null">
+        start_time,
+      </if>
+      <if test="endTime != null">
+        end_time,
+      </if>
+      <if test="remindTime != null">
+        remind_time,
+      </if>
+      <if test="remark != null">
+        remark,
+      </if>
+      <if test="openId != null">
+        open_id,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="remindThing != null">
+        #{remindThing,jdbcType=VARCHAR},
+      </if>
+      <if test="thingAddress != null">
+        #{thingAddress,jdbcType=VARCHAR},
+      </if>
+      <if test="startTime != null">
+        #{startTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="endTime != null">
+        #{endTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="remindTime != null">
+        #{remindTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="remark != null">
+        #{remark,jdbcType=VARCHAR},
+      </if>
+      <if test="openId != null">
+        #{openId,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.example.myapp.model.Schedule">
+    update schedule
+    <set>
+      <if test="remindThing != null">
+        remind_thing = #{remindThing,jdbcType=VARCHAR},
+      </if>
+      <if test="thingAddress != null">
+        thing_address = #{thingAddress,jdbcType=VARCHAR},
+      </if>
+      <if test="startTime != null">
+        start_time = #{startTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="endTime != null">
+        end_time = #{endTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="remindTime != null">
+        remind_time = #{remindTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="remark != null">
+        remark = #{remark,jdbcType=VARCHAR},
+      </if>
+      <if test="openId != null">
+        open_id = #{openId,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.example.myapp.model.Schedule">
+    update schedule
+    set remind_thing = #{remindThing,jdbcType=VARCHAR},
+      thing_address = #{thingAddress,jdbcType=VARCHAR},
+      start_time = #{startTime,jdbcType=TIMESTAMP},
+      end_time = #{endTime,jdbcType=TIMESTAMP},
+      remind_time = #{remindTime,jdbcType=TIMESTAMP},
+      remark = #{remark,jdbcType=VARCHAR},
+      open_id = #{openId,jdbcType=VARCHAR}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+</mapper>
