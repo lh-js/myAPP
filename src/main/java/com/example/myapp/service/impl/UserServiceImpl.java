@@ -40,124 +40,163 @@ public class UserServiceImpl implements UserService {
     @Resource
     private UserExtDAO userExtDAO;
 
+    /*
+     * 分页获取所有用户
+     * */
     @Override
-    public QueryResult<User> selectAllUser(QueryRequest<User> queryRequest){
-        Page page= PageHelper.startPage(queryRequest.getPageCondition().getPageNo(),queryRequest.getPageCondition().getPageSize());
+    public QueryResult<User> selectAllUser(QueryRequest<User> queryRequest) {
+        Page page = PageHelper.startPage(queryRequest.getPageCondition().getPageNo(), queryRequest.getPageCondition().getPageSize());
         userExtDAO.selectAll(queryRequest.getCondition());
         return new QueryResult<>(page);
     }
 
+    /*
+     * 登录
+     * */
     @Override
     public UserVO userLogin(UserVO user) throws Exception {
-        checkHeaderName();
-        String openId= getOpenId(user.getCode());
-        if(openId==null  || openId==""){
-            throw new NoDataFoundException("openId获取失败");
-        }
-//        String token= getAccessToken();
-//        if(token==null  || token==""){
-//            throw new NoDataFoundException("token获取失败");
-//        }
-
-        SimpleDateFormat dateFormat = new SimpleDateFormat(
-                "yyyy-MM-dd HH:mm:ss");
-        long currentTime = System.currentTimeMillis() ;
-        System.out.print("当前时间:");
-        System.out.println(dateFormat.format(currentTime));
-        currentTime +=110*60*1000;
-        Date date=new Date(currentTime);
-        System.out.print("2小时后时间:");
-        System.out.println(dateFormat.format(date));
-
+        String openId = getOpenId(user.getCode());
         String token = UUID.randomUUID().toString();
         user.setToken(token);
         user.setOpenId(openId);
         user.setCode(user.getCode());
+        Date date = getTwoHoursLater();
         user.setExpirationttime(date);
-
-        if(checkIsRegister(openId)==null){
+        if (checkIsRegister(openId) == null) {
             registerUser(user);
-        }else {
+        } else {
             updateExpirationtTime(user);
         }
 
         return user;
     }
 
+    /*
+     * 获取用户信息
+     * */
     @Override
-    public User getUserInfo(){
-        String token= checkHeaderName();
-        if(token==null || token==""){
-            throw new NoDataFoundException("token获取失败");
-        }
-        User user= checkLogin(token);
-        if(user==null){
-            throw new NoDataFoundException("token过期，请重新登录！");
-        }
-
+    public User updateToken() {
+        String token = checkHeaderName();
+        User user = checkLogin(token);
+        Date date = getTwoHoursLater();
+        user.setExpirationttime((date));
+        updateExpirationtTime(user);
         return user;
     }
 
-    String getOpenId(String code) throws Exception {
-        String APPID="wxc509139d5e64d413";
-        String SECRET="34ae9c94e749dc6cc930794ea23cb588";
-        String JSCODE=code;
-        String TYPE="authorization_code";
-        String getUrl = "https://api.weixin.qq.com/sns/jscode2session?appid="+APPID+"&secret="+SECRET+"&js_code="+JSCODE+"&grant_type="+TYPE;
-        JSONObject jsonObject= HttpUtils.getHttp(getUrl);
-        return jsonObject.getString("openid");
+    /*
+    * 获取两小时后的时间
+    * */
+    public Date getTwoHoursLater() {
+        SimpleDateFormat dateFormat = new SimpleDateFormat(
+                "yyyy-MM-dd HH:mm:ss");
+        long currentTime = System.currentTimeMillis();
+        System.out.print("当前时间:");
+        System.out.println(dateFormat.format(currentTime));
+        currentTime += 110 * 60 * 1000;
+        Date date = new Date(currentTime);
+        System.out.print("2小时后时间:");
+        System.out.println(dateFormat.format(date));
+        return date;
     }
 
-    String getAccessToken() throws Exception {
-        String APPID="wxc509139d5e64d413";
-        String SECRET="34ae9c94e749dc6cc930794ea23cb588";
-        String TYPE="client_credential";
-        String getUrl = "https://api.weixin.qq.com/cgi-bin/token?grant_type="+TYPE+"&appid="+APPID+"&secret="+SECRET;
+    /*
+    * 获取openId
+    * */
+    String getOpenId(String code) throws Exception {
+        String APPID = "wxc509139d5e64d413";
+        String SECRET = "34ae9c94e749dc6cc930794ea23cb588";
+        String JSCODE = code;
+        String TYPE = "authorization_code";
+        String getUrl = "https://api.weixin.qq.com/sns/jscode2session?appid=" + APPID + "&secret=" + SECRET + "&js_code=" + JSCODE + "&grant_type=" + TYPE;
         JSONObject jsonObject = HttpUtils.getHttp(getUrl);
-        return jsonObject.getString("access_token");
+        String openId = jsonObject.getString("openid");
+        if (openId == null || openId == "") {
+            throw new NoDataFoundException("openId获取失败");
+        }
+        return openId;
+    }
+
+    /*
+    * 获取微信accessToken
+    * */
+    String getAccessToken() throws Exception {
+        String APPID = "wxc509139d5e64d413";
+        String SECRET = "34ae9c94e749dc6cc930794ea23cb588";
+        String TYPE = "client_credential";
+        String getUrl = "https://api.weixin.qq.com/cgi-bin/token?grant_type=" + TYPE + "&appid=" + APPID + "&secret=" + SECRET;
+        JSONObject jsonObject = HttpUtils.getHttp(getUrl);
+        String accessToken = jsonObject.getString("access_token");
+        if (accessToken == null || accessToken == "") {
+            throw new NoDataFoundException("access_token获取失败");
+        }
+        return accessToken;
     }
 
     /**
      * 获取判断请求头的参数
+     *
      * @return
      */
-    String checkHeaderName(){
+    String checkHeaderName() {
         RequestAttributes ra = RequestContextHolder.getRequestAttributes();
-        if(Objects.isNull(ra)){
-            System.out.println("服务里RequestAttributes对象为空");
-            return null;
+        if (Objects.isNull(ra)) {
+            throw new NoDataFoundException("服务里RequestAttributes对象为空");
         }
         ServletRequestAttributes sra = (ServletRequestAttributes) ra;
         HttpServletRequest request = sra.getRequest();
-        Enumeration<String> headerNames = request.getHeaderNames();
+//        Enumeration<String> headerNames = request.getHeaderNames();
         String token = request.getHeader("authorization");
-        System.out.println("accesstoken:"+token);
+        if (token == null || token == "") {
+            throw new NoDataFoundException("token获取失败");
+        }
+        System.out.println("token:" + token);
         return token;
     }
 
-    User checkIsRegister(String openId){
+    /*
+    * 判断是否注册
+    * */
+    User checkIsRegister(String openId) {
+        User user=userExtDAO.selectByPrimaryKey((openId));
+        if(user==null){
+            throw new NoDataFoundException("用户未注册");
+        }
         return userExtDAO.selectByPrimaryKey((openId));
     }
 
-    int registerUser(User user){
+    /*
+    * 用户注册
+    * */
+    int registerUser(User user) {
+        int i=userExtDAO.insertUser(user);
+        if(i==0){
+            throw new NoDataFoundException("用户注册失败");
+        }
         return userExtDAO.insertUser(user);
     }
 
-    int updateExpirationtTime(User user){
-        return userExtDAO.updateByPrimaryKey(user);
+    /*
+    * 更新token
+    * */
+    int updateExpirationtTime(User user) {
+        int i= userExtDAO.updateExpirationtTime(user);
+        if(i==0){
+            throw new NoDataFoundException("koken更新失败");
+        }
+        return i;
     }
 
-     User checkLogin(String token){
-        User userInfo= userExtDAO.selectByToken(token);
-        if(userInfo==null) {
+    User checkLogin(String token) {
+        User userInfo = userExtDAO.selectByToken(token);
+        if (userInfo == null) {
             throw new NoDataFoundException("用户不存在，请重新登录");
         }
-        Date now=new Date();
-        if(now.compareTo(userInfo.getExpirationttime())<0){
-            return userInfo;
+        Date now = new Date();
+        if (now.compareTo(userInfo.getExpirationttime()) > 0) {
+            throw new NoDataFoundException("token过期，请重新登录！");
         }
-
-        return null;
+        return userInfo;
     }
 
 }

@@ -35,48 +35,52 @@ public class ScheduleServiceImpl implements ScheduleService {
 
     @Override
     public int insertSchedule(Schedule record) {
-        User user = userService.getUserInfo();
+        User user = userService.updateToken();
         System.out.println(user);
-        if(user==null){
-            throw new NoDataFoundException("用户信息获取失败");
-        }
         record.setOpenId(user.getOpenId());
-        return scheduleExtDAO.insert(record);
+        int i=scheduleExtDAO.insert(record);
+        if(i==0){
+            throw new NoDataFoundException("日程添加失败");
+        }
+        return i;
     }
 
     @Override
     public List<Schedule> selectByOpenId() {
-        User user = userService.getUserInfo();
+        User user = userService.updateToken();
         System.out.println(user);
-        if(user==null){
-            throw new NoDataFoundException("用户信息获取失败");
+        List<Schedule> list= scheduleExtDAO.selectByOpenId(user.getOpenId());
+        if(list==null){
+            throw new NoDataFoundException("日程列表获取失败");
         }
-        return scheduleExtDAO.selectByOpenId(user.getOpenId());
+        return list;
     }
 
     @Override
     public Schedule getScheduleById(Integer id){
-        User user = userService.getUserInfo();
+        User user = userService.updateToken();
         System.out.println(user);
-        if(user==null){
-            throw new NoDataFoundException("用户信息获取失败");
+        Schedule schedule=scheduleExtDAO.selectByPrimaryKey(id);
+        if(schedule==null){
+            throw new NoDataFoundException("日程详情获取失败");
         }
-        return scheduleExtDAO.selectByPrimaryKey(id);
+        return schedule;
     }
 
     @Override
     public int updateSchedule(Schedule schedule){
-        User user = userService.getUserInfo();
+        User user = userService.updateToken();
         System.out.println(user);
-        if(user==null){
-            throw new NoDataFoundException("用户信息获取失败");
-        }
         schedule.setOpenId(user.getOpenId());
-        return scheduleExtDAO.updateByPrimaryKey(schedule);
+        int i= scheduleExtDAO.updateByPrimaryKey(schedule);
+        if(i==0){
+            throw new NoDataFoundException("日程更新失败");
+        }
+        return i;
     }
 
     JSONObject send(String remindThing,String thingAddress, String startTime,String endTime,String remark) throws Exception {
-        User user= userService.getUserInfo();
+        User user= userService.updateToken();
         // 1.请求URL
         String postUrl = "https://api.weixin.qq.com/cgi-bin/message/subscribe/send?access_token="+user.getToken();
         // 2.请求参数JSON格式

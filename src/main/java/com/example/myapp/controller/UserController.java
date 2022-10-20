@@ -35,7 +35,7 @@ public class UserController {
 
     @PostMapping("/getUserInfo")
     public User getUserInfo(){
-        return userServiceImpl.getUserInfo();
+        return userServiceImpl.updateToken();
     }
 
 }

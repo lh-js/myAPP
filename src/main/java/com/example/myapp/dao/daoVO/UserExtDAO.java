@@ -13,4 +13,6 @@ public interface UserExtDAO extends UserDAO {
     int insertUser(User user);
 
     User selectByToken(String token);
+
+    int updateExpirationtTime(User user);
 }

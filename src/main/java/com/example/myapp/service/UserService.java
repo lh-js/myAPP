@@ -15,5 +15,5 @@ public interface UserService {
 
     UserVO userLogin(UserVO user) throws Exception;
 
-    User getUserInfo();
+    User updateToken();
 }

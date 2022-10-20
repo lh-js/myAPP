@@ -18,11 +18,17 @@
     </select>
     <insert id="insertUser" keyColumn="open_id" keyProperty="openId" parameterType="com.example.myapp.model.User" useGeneratedKeys="true">
         insert into user (username, avatar,open_id,expirationtTime,token)
-        values (#{username,jdbcType=VARCHAR}, #{avatar,jdbcType=VARCHAR},#{openId,jdbcType=VARCHAR},#{expirationttime,jdbcType=TIMESTAMP},#{token,jdbcType=VARCHAR}))
+        values (#{username,jdbcType=VARCHAR}, #{avatar,jdbcType=VARCHAR},#{openId,jdbcType=VARCHAR},#{expirationttime,jdbcType=TIMESTAMP},#{token,jdbcType=VARCHAR})
     </insert>
     <select id="selectByToken" resultMap="com.example.myapp.dao.daoVO.UserExtDAO.BaseResultMap" parameterType="java.lang.String">
         select
         <include refid="Base_Column_List"></include>
         from user where token = #{token,jdbcType=VARCHAR}
     </select>
+    <update id="updateExpirationtTime" parameterType="com.example.myapp.model.User">
+        update user
+        set expirationtTime = #{expirationttime,jdbcType=TIMESTAMP},
+            token = #{token,jdbcType=VARCHAR}
+        where open_id = #{openId,jdbcType=VARCHAR}
+    </update>
 </mapper>
