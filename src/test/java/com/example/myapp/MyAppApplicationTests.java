@@ -1,5 +1,8 @@
 package com.example.myapp;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson.serializer.SerializerFeature;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -8,6 +11,7 @@ import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
 
 import javax.annotation.Resource;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -20,11 +24,15 @@ class MyAppApplicationTests {
     //操作k-v都是对象对象的
     @Test
     void contextLoads() {
-        ValueOperations ops = stringRedisTemplate.opsForValue();    // 首先redisTemplate.opsForValue的目的就是表明是以key，value形式储存到Redis数据库中数据的
-        ops.set("address1","zhengzhou");// 到这里就表明Redis数据库中存储了key为address1，value为zhengzhou的数据了（取的时候通过key取数据）// 表明取的是key，value型的数据
-        Object o = ops.get("address1");  // 获取Redis数据库中key为address1对应的value数据
-        stringRedisTemplate.delete("address1");
-        System.out.println(o);
+        ValueOperations ops = stringRedisTemplate.opsForValue();
+        JSONObject map = new JSONObject();
+//        String accessToken=getAccessTokenFromWX();
+//        map.put("accessToken",accessToken);
+//        Date expirationtTime=userService.getTwoHoursLater();
+        Date now=new Date();
+        map.put("expirationtTime",now);
+        String mapString= JSON.toJSONString(map, SerializerFeature.DisableCircularReferenceDetect);
+        ops.set("accessTokenItem",mapString);// 到这里就表明Redis数据库中存储了key为address1，value为zhengzhou的数据了（取的时候通过key取数据）// 表明取的是key，value型的数据
     }
 
 }

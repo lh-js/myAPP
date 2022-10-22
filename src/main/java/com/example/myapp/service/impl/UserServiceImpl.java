@@ -120,18 +120,6 @@ public class UserServiceImpl implements UserService {
     /*
     * 获取微信accessToken
     * */
-    String getAccessToken() throws Exception {
-        String APPID = "wxc509139d5e64d413";
-        String SECRET = "34ae9c94e749dc6cc930794ea23cb588";
-        String TYPE = "client_credential";
-        String getUrl = "https://api.weixin.qq.com/cgi-bin/token?grant_type=" + TYPE + "&appid=" + APPID + "&secret=" + SECRET;
-        JSONObject jsonObject = HttpUtils.getHttp(getUrl);
-        String accessToken = jsonObject.getString("access_token");
-        if (accessToken == null || accessToken == "") {
-            throw new NoDataFoundException("access_token获取失败");
-        }
-        return accessToken;
-    }
 
     /**
      * 获取判断请求头的参数
